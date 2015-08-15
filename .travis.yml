@@ -17,22 +17,21 @@ compiler:
 # get sufficiently recent tools and libraries. The non-test toolchain PPA
 # misses out packages for 12.04 for some reason.
 
-sudo: required
+sudo: false
 
-before_install:
-    - sudo add-apt-repository -y ppa:kalakris/cmake
-    - sudo apt-add-repository -y ppa:ubuntu-sdk-team/ppa
-    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq cmake g++-4.9 libgif-dev qtbase5-dev qtmultimedia5-dev libqt5svg5-dev
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-    - sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30
-    - sudo update-alternatives --set cc /usr/bin/gcc
-    - sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30
-    - sudo update-alternatives --set c++ /usr/bin/g++
-    - sudo update-alternatives --set gcc /usr/bin/gcc-4.9
-    - sudo update-alternatives --set g++ /usr/bin/g++-4.9
+addons:
+    apt:
+        sources:
+            - kalakris-cmake
+            - ubuntu-sdk-team
+            - ubuntu-toolchain-r-test
+        packages:
+            - cmake
+            - g++-4.9
+            - libgif-dev
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - libqt5svg5-dev
 
 # For some reason, CMake in this hacked-up environment is setting an include
 # path of:
@@ -53,7 +52,7 @@ before_install:
 
 script:
     - mkdir build
-    - cd build && cmake .. -DCMAKE_BUILD_TYPE=debug -DCMAKE_CXX_FLAGS="-I /usr/share/qt5/mkspecs/linux-g++-64/" && make -j 2
+    - cd build && CC=gcc-4.9 CXX=g++-4.9 cmake .. -DCMAKE_BUILD_TYPE=debug -DCMAKE_CXX_FLAGS="-I /usr/share/qt5/mkspecs/linux-g++-64/" && make -j 2 VERBOSE=1
 
 # Don't try to build 2.x-series branches since we don't have the dependencies
 # for them (we currently depend on bundled ones which have been removed). Could
